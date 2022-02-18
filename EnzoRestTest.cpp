@@ -54,63 +54,77 @@ using namespace concurrency::streams;
 #define STOCK_BDO     _T("https://phisix-api4.appspot.com/stocks/BDO.json")
 #define STOCK_BDO     _T("https://phisix-api4.appspot.com/stocks/BDO.json")
 #define STOCK_BDO     _T("https://phisix-api4.appspot.com/stocks/BDO.json")
+#define STOCK_ALL      _T("https://phisix-api4.appspot.com/stocks.json")
 
-
-inline CStock JSONToStock(string_t sJSON)
+inline map<string_t, CStock> JSONToStock(string_t sJSON)
 {
     CJSONParser parse;
     CStock cstock;
     string_t sTemp;
     float fTemp;
     unsigned long ulTemp;
-
+    map<string_t, string_t> m_mapLst;
+    map<string_t, CStock> m_stockList;
+    map<string_t, string_t>::iterator it;
     parse.SetJSONString(sJSON);
 
-    parse.GetValue(_T("\"name\""), sTemp);
-    cstock.SetCompanyName(sTemp);
+    m_mapLst = parse.GetParsedStrings();
+    it = m_mapLst.begin();
+    while (it != m_mapLst.end())
+    {
+        parse.GetValue(it->second, _T("\"name\""), sTemp);
+        cstock.SetCompanyName(sTemp);
 
-    parse.GetValue(_T("\"currency\""), sTemp);
-    cstock.SetCurrency(sTemp);
+        parse.GetValue(it->second, _T("\"currency\""), sTemp);
+        cstock.SetCurrency(sTemp);
 
-    parse.GetValue(_T("\"symbol\""), sTemp);
-    cstock.SetStockSymbol(sTemp);
+        parse.GetValue(it->second, _T("\"symbol\""), sTemp);
+        cstock.SetStockSymbol(sTemp);
 
-    parse.GetValue(_T("\"as_of\""), sTemp);
-    cstock.SetDate(sTemp);
+        parse.GetValue(it->second, _T("\"amount\""), fTemp);
+        cstock.SetPricePerShare(fTemp);
 
-    parse.GetValue(_T("\"amount\""), fTemp);
-    cstock.SetPricePerShare(fTemp);
+        parse.GetValue(it->second, _T("\"percent_change\""), fTemp);
+        cstock.SetPercentChange(fTemp);
 
-    parse.GetValue(_T("\"percent_change\""), fTemp);
-    cstock.SetPercentChange(fTemp);
+        parse.GetValue(it->second, _T("\"volume\""), ulTemp);
+        cstock.SetVolume(ulTemp);
 
-    parse.GetValue(_T("\"volume\""), ulTemp);
-    cstock.SetVolume(ulTemp);
+        parse.GetValue(_T("\"as_of\""), sTemp);
+        cstock.SetDate(sTemp);
 
-    return cstock;
+        m_stockList[cstock.GetStockSymbol()] = cstock;
+        it++;
+    }
+
+    return m_stockList;
 }
 void TestHTTP()
 {
     string_t sJSON;
-
+    http_client client(STOCK_ALL);//(STOCK_BDO);
+    ULONGLONG prev = 0, current = 0;
     while (!_kbhit())
     {
-        http_client client(STOCK_BDO);
+              // client.base_uri() = STOCK_BDO;
         auto resp = client.request(_T("GET")).get();
 
-       // wcout << _T("STATUS :") << resp.status_code() <<_T("\033[F")<< endl;
-      //  wcout << _T("content-type : ") << resp.headers().content_type() << _T("\033[F") << endl;
-        //wcout << resp.extract_string(true).get() << _T("\033[F") << endl;
+       
         sJSON = resp.extract_string(true).get();
-        CStock cstock = JSONToStock(sJSON);
-
-        wcout << _T("Company Name: ") << cstock.GetCompanyName() << endl;
-        wcout << _T("Currency: ") << cstock.GetCurrency() << endl;
-        wcout << _T("Price Per Share: ") << cstock.GetPricePerShare() << endl;
-        wcout << _T("Stock Symbol: ") << cstock.GetStockSymbol() << endl;
-        wcout << _T("Percent Change: ") << cstock.GetPercentChange() << endl;
-        wcout << _T("Volume: ") << cstock.GetVolume() << endl;
-        wcout << _T("Date: ") << cstock.GetDate() << endl;
+        prev = GetTickCount64();
+        map<string_t, CStock> cstock = JSONToStock(sJSON);
+      current = GetTickCount64();
+      wcout << _T("PARSING TIME: ") << current - prev << _T(" ms") << endl;
+      /*    wcout << _T("Name: ") << cstock.GetCompanyName() << _T(" ");
+        wcout << _T("Symbol: ") << cstock.GetStockSymbol() << _T(" ");
+        wcout << _T("Currency: ") << cstock.GetCurrency() << _T(" ");
+        wcout << _T("Price: ") << cstock.GetPricePerShare() << _T(" ");
+        wcout << _T("Change: ") << cstock.GetPercentChange() << _T(" ");
+        wcout << _T("Volume: ") << cstock.GetVolume() << _T(" ");
+        wcout << _T("Date: ") << cstock.GetDate() << _T("\r\n");
+        wcout << _T("PARSING TIME: ") << current - prev << _T(" ms") << endl;*/
+       
+        
         Sleep(1000);
     }
 }

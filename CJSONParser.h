@@ -2,6 +2,7 @@
 #include <string>
 #include <functional>
 #include <tchar.h>
+#include <map>
 using namespace std;
 
 #ifndef string_t
@@ -15,16 +16,9 @@ using namespace std;
 
 class CJSONParser
 {
-public:
-    typedef enum
-    {
-        JSONstring=0,
-        JSONfloat,
-        JSONulong,
-        JSONint
-    }JSON_DATA_TYPE;
 protected:
 	string_t m_sJSONstring;
+    map<string_t, string_t> m_mapStocks;
 
     inline string_t& ltrim(string_t& s)
     {
@@ -47,7 +41,7 @@ protected:
         sMain.erase(std::remove(sMain.begin(), sMain.end(), _T(' ')), sMain.end());
         return sMain;
     }
-
+    void ParseJSON();
 public:
     CJSONParser();
     CJSONParser(string_t sJSON);
@@ -56,5 +50,12 @@ public:
     void GetValue(string_t sTag, unsigned long &data);
     void GetValue(string_t sTag, float& data);
     void GetValue(string_t sTag, string_t& data);
+    void GetValue(string_t sJSONstring, string_t sTag, unsigned long& data);
+    void GetValue(string_t sJSONstring, string_t sTag, float& data);
+    void GetValue(string_t sJSONstring, string_t sTag, string_t& data);
+    map<string_t, string_t> GetParsedStrings()
+    {
+        return m_mapStocks;
+    }
 };
 

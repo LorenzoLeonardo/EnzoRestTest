@@ -19,10 +19,13 @@ protected:
     float           m_fPercentChange;
     unsigned long   m_ulVolume;
     string_t        m_sStockSymbol;
+    string_t        m_sDate;
+
 
 public:
 
-    CStock() :m_sCompanyName(_T("")), m_sCurrency(_T("")), m_fPricePerShare(0), m_fPercentChange(0), m_ulVolume(0), m_sStockSymbol(_T("")) {}
+    CStock() :m_sCompanyName(_T("")), m_sCurrency(_T("")), m_fPricePerShare(0), m_fPercentChange(0),
+        m_ulVolume(0), m_sStockSymbol(_T("")), m_sDate(_T("")){}
     ~CStock() {}
 
     CStock operator=(const CStock& b)
@@ -33,6 +36,8 @@ public:
         this->m_fPercentChange = b.m_fPercentChange;
         this->m_ulVolume = b.m_ulVolume;
         this->m_sStockSymbol = b.m_sStockSymbol;
+        this->m_sDate = b.m_sDate;
+
         return *this;
     }
 
@@ -60,6 +65,12 @@ public:
     {
         m_sStockSymbol = sStockSymbol;
     }
+    void SetDate(string_t sDate)
+    {
+        m_sDate = sDate;
+    }
+
+
     string_t GetCompanyName()
     {
         return m_sCompanyName;
@@ -84,4 +95,9 @@ public:
     {
         return m_sStockSymbol;
     }
+    string_t GetDate()
+    {
+        return m_sDate;
+    }
+
 };

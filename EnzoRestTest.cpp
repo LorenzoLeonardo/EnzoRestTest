@@ -9,6 +9,7 @@
 #include <cpprest/filestream.h>
 #include "CStock.h"
 #include "CJSONParser.h"
+
 #ifdef _DEBUG
 #pragma comment(lib,"cpprest141_2_10d.lib")
 #else
@@ -74,6 +75,9 @@ inline CStock JSONToStock(string_t sJSON)
     parse.GetValue(_T("\"symbol\""), sTemp);
     cstock.SetStockSymbol(sTemp);
 
+    parse.GetValue(_T("\"as_of\""), sTemp);
+    cstock.SetDate(sTemp);
+
     parse.GetValue(_T("\"amount\""), fTemp);
     cstock.SetPricePerShare(fTemp);
 
@@ -100,13 +104,13 @@ void TestHTTP()
         sJSON = resp.extract_string(true).get();
         CStock cstock = JSONToStock(sJSON);
 
-        wcout << cstock.GetCompanyName() << endl;
-        wcout << cstock.GetCurrency() << endl;
-        wcout << cstock.GetPricePerShare() << endl;
-        wcout << cstock.GetStockSymbol() << endl;
-        wcout << cstock.GetPercentChange() << endl;
-        wcout << cstock.GetVolume() << endl;
-
+        wcout << _T("Company Name: ") << cstock.GetCompanyName() << endl;
+        wcout << _T("Currency: ") << cstock.GetCurrency() << endl;
+        wcout << _T("Price Per Share: ") << cstock.GetPricePerShare() << endl;
+        wcout << _T("Stock Symbol: ") << cstock.GetStockSymbol() << endl;
+        wcout << _T("Percent Change: ") << cstock.GetPercentChange() << endl;
+        wcout << _T("Volume: ") << cstock.GetVolume() << endl;
+        wcout << _T("Date: ") << cstock.GetDate() << endl;
         Sleep(1000);
     }
 }

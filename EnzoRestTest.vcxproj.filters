@@ -18,8 +18,19 @@
     <ClCompile Include="EnzoRestTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CJSONParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CStock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CJSONParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

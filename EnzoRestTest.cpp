@@ -4,10 +4,11 @@
 #include <tchar.h>
 #include <iostream>
 #include <conio.h>
-
+#include <string.h>
 #include <cpprest/http_client.h>
 #include <cpprest/filestream.h>
-
+#include "CStock.h"
+#include "CJSONParser.h"
 #ifdef _DEBUG
 #pragma comment(lib,"cpprest141_2_10d.lib")
 #else
@@ -22,22 +23,97 @@ using namespace concurrency::streams;
 
 
 
+/*
+{"stock":
+    [
+        {"name" :"Banco de Oro",
+        "price" :
+                {
+	                "currency":"PHP",
+		                "amount" : 134.50
+                },
+        "percent_change" : -0.37,
+        "volume" : 1294530,
+        "symbol" : "BDO"
+        }
+    ], 
+    "as_of":"2022-02-18T12:50:00+08:00"
+
+}*/
+
+#define STOCK_BDO     _T("https://phisix-api4.appspot.com/stocks/BDO.json")
+#define STOCK_BPI     _T("https://phisix-api4.appspot.com/stocks/BPI.json")
+#define STOCK_CHIB    _T("https://phisix-api4.appspot.com/stocks/CHIB.json")
+#define STOCK_COL     _T("https://phisix-api4.appspot.com/stocks/COL.json")
+#define STOCK_EW      _T("https://phisix-api4.appspot.com/stocks/EW.json")
+#define STOCK_BDO     _T("https://phisix-api4.appspot.com/stocks/BDO.json")
+#define STOCK_BDO     _T("https://phisix-api4.appspot.com/stocks/BDO.json")
+#define STOCK_BDO     _T("https://phisix-api4.appspot.com/stocks/BDO.json")
+#define STOCK_BDO     _T("https://phisix-api4.appspot.com/stocks/BDO.json")
+#define STOCK_BDO     _T("https://phisix-api4.appspot.com/stocks/BDO.json")
+#define STOCK_BDO     _T("https://phisix-api4.appspot.com/stocks/BDO.json")
+#define STOCK_BDO     _T("https://phisix-api4.appspot.com/stocks/BDO.json")
+
+
+inline CStock JSONToStock(string_t sJSON)
+{
+    CJSONParser parse;
+    CStock cstock;
+    string_t sTemp;
+    float fTemp;
+    unsigned long ulTemp;
+
+    parse.SetJSONString(sJSON);
+
+    parse.GetValue(_T("\"name\""), sTemp);
+    cstock.SetCompanyName(sTemp);
+
+    parse.GetValue(_T("\"currency\""), sTemp);
+    cstock.SetCurrency(sTemp);
+
+    parse.GetValue(_T("\"symbol\""), sTemp);
+    cstock.SetStockSymbol(sTemp);
+
+    parse.GetValue(_T("\"amount\""), fTemp);
+    cstock.SetPricePerShare(fTemp);
+
+    parse.GetValue(_T("\"percent_change\""), fTemp);
+    cstock.SetPercentChange(fTemp);
+
+    parse.GetValue(_T("\"volume\""), ulTemp);
+    cstock.SetVolume(ulTemp);
+
+    return cstock;
+}
 void TestHTTP()
 {
+    string_t sJSON;
+
     while (!_kbhit())
     {
-        http_client client(_T("https://phisix-api4.appspot.com/stocks/BDO.json"));
+        http_client client(STOCK_BDO);
         auto resp = client.request(_T("GET")).get();
 
-        wcout << _T("STATUS :") << resp.status_code() <<_T("\033[F")<< endl;
-        wcout << _T("content-type : ") << resp.headers().content_type() << _T("\033[F") << endl;
-        wcout << resp.extract_string(true).get() << _T("\033[F") << endl;
+       // wcout << _T("STATUS :") << resp.status_code() <<_T("\033[F")<< endl;
+      //  wcout << _T("content-type : ") << resp.headers().content_type() << _T("\033[F") << endl;
+        //wcout << resp.extract_string(true).get() << _T("\033[F") << endl;
+        sJSON = resp.extract_string(true).get();
+        CStock cstock = JSONToStock(sJSON);
+
+        wcout << cstock.GetCompanyName() << endl;
+        wcout << cstock.GetCurrency() << endl;
+        wcout << cstock.GetPricePerShare() << endl;
+        wcout << cstock.GetStockSymbol() << endl;
+        wcout << cstock.GetPercentChange() << endl;
+        wcout << cstock.GetVolume() << endl;
+
         Sleep(1000);
     }
 }
 
 int main()
 {
+    string_t s;
     TestHTTP();
     std::cout << "Hello World!\n";
 }

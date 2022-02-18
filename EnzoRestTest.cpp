@@ -113,8 +113,8 @@ void TestHTTP()
         sJSON = resp.extract_string(true).get();
         prev = GetTickCount64();
         map<string_t, CStock> cstock = JSONToStock(sJSON);
-      current = GetTickCount64();
-      wcout << _T("PARSING TIME: ") << current - prev << _T(" ms") << endl;
+        current = GetTickCount64();
+        wcout << _T("BULK PARSING TIME: ") << current - prev << _T(" ms ") << cstock.size()<<_T("stocks")<<endl;
       /*    wcout << _T("Name: ") << cstock.GetCompanyName() << _T(" ");
         wcout << _T("Symbol: ") << cstock.GetStockSymbol() << _T(" ");
         wcout << _T("Currency: ") << cstock.GetCurrency() << _T(" ");
